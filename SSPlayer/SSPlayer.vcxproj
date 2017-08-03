@@ -145,12 +145,20 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="acyclebuffer.cpp" />
+    <ClCompile Include="Decoder.cpp" />
+    <ClCompile Include="function.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Picture.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Thread.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="acyclebuffer.h" />
+    <ClInclude Include="Decoder.h" />
+    <ClInclude Include="function.h" />
     <ClInclude Include="Picture.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="Thread.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
