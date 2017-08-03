@@ -5,7 +5,7 @@
 //
 //创建时间：2017-7-20 21:19:03
 //完工时间：2017-8-2   10:36:06
-//代码量：453行
+//代码量：536行
 //制作周期：3 天
 //
 //===============================
@@ -38,6 +38,7 @@ extern "C"
 }
 
 #include "acyclebuffer.h"
+#include "Picture.h"
 
 //Refresh event
 #define SFM_REFRESH_EVENT (SDL_USEREVENT+1)
@@ -164,6 +165,7 @@ private:
 	SDL_AudioSpec wanted_spec;
 
 	Decoder decoder;
+	Picture *sdlpicture;
 
 	int clickCnt_L;
 	int timeCnt_L;
@@ -334,8 +336,18 @@ bool Player::init()
 		return -1;
 	}
 	SDL_SetWindowMinimumSize(screen, 300, 200);
+
 	//创建渲染器
 	sdlRenderer = SDL_CreateRenderer(screen, -1, 0);
+
+	//init Picture
+	sdlpicture = new Picture(sdlRenderer);
+	if (sdlpicture == nullptr)
+		throw std::runtime_error("Picture Init Failed");
+
+	//设置图标
+	SDL_SetWindowIcon(screen, sdlpicture->icon);
+
 	//创建纹理
 	sdlTexture = SDL_CreateTexture(sdlRenderer, SDL_PIXELFORMAT_IYUV, SDL_TEXTUREACCESS_STREAMING, decoder.pCodecCtx->width, decoder.pCodecCtx->height);
 	//初始化矩形

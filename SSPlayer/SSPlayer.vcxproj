@@ -146,9 +146,11 @@
   <ItemGroup>
     <ClCompile Include="acyclebuffer.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Picture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="acyclebuffer.h" />
+    <ClInclude Include="Picture.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
