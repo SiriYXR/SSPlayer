@@ -36,6 +36,10 @@ extern "C"
 
 #define MAX_AUDIO_FRAME_SIZE 192000//1 second of 48khz 32bit audio 
 
+//WindowMinimum
+#define WindowMin_W 300
+#define WindowMin_H 200
+
 //Font path
 #define Font_songti "data/font/simsun.ttc"
 #define Font_kaiti "data/font/simkai.ttf"

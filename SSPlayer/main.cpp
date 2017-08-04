@@ -12,11 +12,12 @@
 //
 //===============================
 
-#include "Player.h"
+//#include "Player.h"
+#include "GUI.h"
 
 int main(int argc, char **argv)
 {
-	Player ssplayer;
+	/*Player ssplayer;
 	SDL_CreateThread(Thread::sfp_refresh_thread, nullptr, nullptr);
 	for (; ssplayer.running();SDL_Delay(1)) {
 		ssplayer.events();
@@ -24,7 +25,11 @@ int main(int argc, char **argv)
 		ssplayer.update();
 
 		ssplayer.render();
-	}
+	}*/
+
+	GUI SSPlayer;
+
+	SSPlayer.Running();
 
 	return 0;
 }

@@ -1,7 +1,5 @@
 #include "Player.h"
 
-#include <string>
-
 bool Player::init()
 {
 	//------------------------------------SDL初始化---------------------------------------------------
@@ -17,8 +15,8 @@ bool Player::init()
 	}
 
 	//初始化窗口大小
-	screen_w = decoder.pCodecCtx->width;
-	screen_h = decoder.pCodecCtx->height;
+	screen_w = decoder.pCodecCtx->width > WindowMin_W ? decoder.pCodecCtx->width : WindowMin_W;
+	screen_h = decoder.pCodecCtx->height > WindowMin_H ? decoder.pCodecCtx->height : WindowMin_H;
 	//创建窗口
 	sprintf(decoder.filebuffer, "%s - SSPlayer", decoder.filename);
 	screen = SDL_CreateWindow(decoder.filebuffer, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screen_w, screen_h, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
@@ -26,7 +24,7 @@ bool Player::init()
 		printf("SDL:could not create window - exiting:%s\n", SDL_GetError());
 		return -1;
 	}
-	SDL_SetWindowMinimumSize(screen, 300, 200);
+	SDL_SetWindowMinimumSize(screen, WindowMin_W, WindowMin_H);
 
 	//创建渲染器
 	sdlRenderer = SDL_CreateRenderer(screen, -1, 0);
@@ -74,8 +72,6 @@ bool Player::init()
 	av_dump_format(decoder.pFormatCtx, 0, decoder.filepath, false);
 	printf("------------------------------------\n");
 
-	counter_click_L = 0;
-	counter_time_L = 0;
 	counter_time_infor = 0;
 
 	return true;
@@ -90,7 +86,6 @@ void Player::update()
 
 	update_infor_volume();
 
-	update_MouseLAction();
 }
 
 void Player::render()
@@ -104,9 +99,8 @@ void Player::render()
 	SDL_RenderPresent(sdlRenderer);
 }
 
-void Player::events()
+void Player::events(SDL_Event &event)
 {
-	if (SDL_PollEvent(&event)) {
 
 		switch (event.type)
 		{
@@ -114,34 +108,17 @@ void Player::events()
 			if (!thread_pause)
 				update_decode();
 			break;
-		case SDL_MOUSEBUTTONDOWN:
-			if (event.button.button == SDL_BUTTON_LEFT) {
-				counter_click_L++;
-				counter_time_L = 0;
-			}
-			else if (event.button.button == SDL_BUTTON_MIDDLE) {
-
-			}
-			break;
 		case SDL_MOUSEWHEEL:
 			if (event.wheel.y > 0) {
-				silence -= 6;
-				if (silence <0)
-					silence = 0;
-				counter_time_infor = 1000;
-				isMute = false;
+				setVolumeUP();
 			}
 			else if (event.wheel.y < 0) {
-				silence += 6;
-				if (silence > 128)
-					silence = 128;
-				counter_time_infor = 1000;
-				isMute = false;
+				setVolumeDown();
 			}
 			break;
 		case SDL_KEYDOWN:
 			if (event.key.keysym.sym == SDLK_SPACE) {
-				thread_pause = !thread_pause;
+				setPause();
 			}
 			else if (event.key.keysym.sym == SDLK_ESCAPE) {
 				if (SDL_GetWindowFlags(screen) == 0x1627) {
@@ -151,18 +128,10 @@ void Player::events()
 					thread_exit = true;
 			}
 			else if (event.key.keysym.sym == SDLK_UP) {
-				silence -= 6;
-				if (silence <0)
-					silence = 0;
-				counter_time_infor = 1000;
-				isMute = false;
+				setVolumeUP();
 			}
 			else if (event.key.keysym.sym == SDLK_DOWN) {
-				silence += 6;
-				if (silence > 128)
-					silence = 128;
-				counter_time_infor = 1000;
-				isMute = false;
+				setVolumeDown();
 			}
 			else if (event.key.keysym.sym == SDLK_RIGHT) {
 
@@ -171,8 +140,7 @@ void Player::events()
 
 			}
 			else if (event.key.keysym.sym == SDLK_v) {
-				counter_time_infor = 1000;
-				isMute = !isMute;
+				setIsMute();
 			}
 			else if (event.key.keysym.sym == SDLK_r) {
 				SDL_SetWindowFullscreen(screen, 0);
@@ -193,7 +161,61 @@ void Player::events()
 			break;
 		}
 
+}
+
+void Player::getWindowSize(int & sw, int & sh)
+{
+	SDL_GetWindowSize(screen, &screen_w, &screen_h);
+	sw = screen_w;
+	sh = screen_h;
+}
+
+void Player::setPause()
+{
+	thread_pause = !thread_pause;
+}
+
+void Player::setVolumeUP()
+{
+	silence -= 6;
+	if (silence <0)
+		silence = 0;
+	counter_time_infor = 1000;
+	isMute = false;
+}
+
+void Player::setVolumeDown()
+{
+	silence += 6;
+	if (silence > 128)
+		silence = 128;
+	counter_time_infor = 1000;
+	isMute = false;
+}
+
+void Player::setIsMute()
+{
+	counter_time_infor = 1000;
+	isMute = !isMute;
+}
+
+void Player::setWindowReSize()
+{
+	SDL_SetWindowFullscreen(screen, 0);
+
+	screen_w = decoder.pCodecCtx->width > WindowMin_W ? decoder.pCodecCtx->width : WindowMin_W;
+	screen_h = decoder.pCodecCtx->height > WindowMin_H ? decoder.pCodecCtx->height : WindowMin_H;
+
+	SDL_SetWindowSize(screen, screen_w, screen_h);
+}
+
+void Player::setDoubleClick()
+{
+	if (SDL_GetWindowFlags(screen) == 0x1627) {
+		SDL_SetWindowFullscreen(screen, 0);
 	}
+	else
+		SDL_SetWindowFullscreen(screen, SDL_WINDOW_FULLSCREEN_DESKTOP);
 }
 
 void Player::update_decode()
@@ -222,28 +244,6 @@ void Player::update_sdlRect()
 		sdlRect.x = 0;
 		sdlRect.y = 0;
 	}
-}
-
-void Player::update_MouseLAction()
-{
-	if (counter_time_L == 400)
-		counter_time_L == 0;
-
-	counter_time_L++;
-
-	if (counter_click_L&&counter_time_L > 100) {
-		thread_pause = !thread_pause;
-		counter_click_L = 0;
-	}
-	else if (counter_click_L == 2 && counter_time_L < 100) {
-		if (SDL_GetWindowFlags(screen) == 0x1627) {
-			SDL_SetWindowFullscreen(screen, 0);
-		}
-		else
-			SDL_SetWindowFullscreen(screen, SDL_WINDOW_FULLSCREEN_DESKTOP);
-		counter_click_L = 0;
-	}
-
 }
 
 void Player::update_infor_volume()

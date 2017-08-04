@@ -17,14 +17,22 @@ public:
 	bool init();
 	void update();
 	void render();
-	void events();
+	void events(SDL_Event &event);
 	bool running() { return m_bRunning; };
+
+	void getWindowSize(int &sw,int &sh);
+
+	void setPause();
+	void setVolumeUP();
+	void setVolumeDown();
+	void setIsMute();
+	void setWindowReSize();
+	void setDoubleClick();
 
 private:
 	void update_running() { m_bRunning = !thread_exit; };
 	void update_decode();
 	void update_sdlRect();
-	void update_MouseLAction();
 	void update_infor_volume();
 
 	void render_Draw(SDL_Texture * tex, SDL_Rect & dstRect, SDL_Rect * clip, float angle, int xPivot, int yPivot, SDL_RendererFlip flip);
@@ -41,14 +49,11 @@ private:
 	SDL_Texture *sdlTexture;
 	SDL_Rect sdlRect;
 	SDL_Thread *video_tid;
-	SDL_Event event;
 	SDL_AudioSpec wanted_spec;
 
 	Decoder decoder;
 	Picture *sdlpicture;
 
-	int counter_click_L;
-	int counter_time_L;
 	int counter_time_infor;
 
 	char buffer_infor[255];
