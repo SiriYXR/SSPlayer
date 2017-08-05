@@ -147,7 +147,6 @@
     <ClCompile Include="acyclebuffer.cpp" />
     <ClCompile Include="Decoder.cpp" />
     <ClCompile Include="function.cpp" />
-    <ClCompile Include="GUI.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Picture.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -157,7 +156,6 @@
     <ClInclude Include="acyclebuffer.h" />
     <ClInclude Include="Decoder.h" />
     <ClInclude Include="function.h" />
-    <ClInclude Include="GUI.h" />
     <ClInclude Include="Picture.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Thread.h" />

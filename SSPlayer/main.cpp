@@ -6,18 +6,17 @@
 //创建时间：2017-07-20   21:19:03
 //完工时间：
 //代码量：589行
-//制作周期：4 天
+//制作周期：6 天
 //
-//最近一次修改时间：2017-08-03   17:56:53
+//最近一次修改时间：2017-08-05   9:37:21
 //
 //===============================
 
-//#include "Player.h"
-#include "GUI.h"
+#include "Player.h"
 
 int main(int argc, char **argv)
 {
-	/*Player ssplayer;
+	Player ssplayer;
 	SDL_CreateThread(Thread::sfp_refresh_thread, nullptr, nullptr);
 	for (; ssplayer.running();SDL_Delay(1)) {
 		ssplayer.events();
@@ -25,11 +24,7 @@ int main(int argc, char **argv)
 		ssplayer.update();
 
 		ssplayer.render();
-	}*/
-
-	GUI SSPlayer;
-
-	SSPlayer.Running();
+	}
 
 	return 0;
 }

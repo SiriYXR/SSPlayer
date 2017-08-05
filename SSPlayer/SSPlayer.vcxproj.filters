@@ -36,9 +36,6 @@
     <ClCompile Include="Decoder.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="GUI.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="acyclebuffer.h">
@@ -57,9 +54,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Decoder.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="GUI.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
