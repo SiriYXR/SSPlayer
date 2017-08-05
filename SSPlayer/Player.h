@@ -6,19 +6,24 @@
 
 #include <string>
 
+class Player_GUI;
+
 class Player
 {
+friend Player_GUI;
+
 public:
 	Player() :m_bRunning(true) { init(); };
 	~Player() {
+		delete sdlpicture;
+		delete gui;
 		SDL_CloseAudio();
 		SDL_Quit();
 	};
 
 	void Running();
-
 private:
-	bool init();
+	int init();
 	void update();
 	void render();
 	void events();
@@ -27,7 +32,6 @@ private:
 	void update_running() { m_bRunning = !thread_exit; };
 	void update_decode();
 	void update_sdlRect();
-	void update_MouseLAction();
 	void update_infor_volume();
 
 	void render_Draw(SDL_Texture * tex, SDL_Rect & dstRect, SDL_Rect * clip, float angle, int xPivot, int yPivot, SDL_RendererFlip flip);
@@ -36,12 +40,19 @@ private:
 	void render_Text(const std::string & message, const std::string & fontFile, int x, int y, int fontSize, SDL_Color color);
 	void render_infor();
 
+	void mouseWheelevent();
+	void keyDownevent();
+	void Windowevent();
+
 	void setVolumeUP();
 	void setVolumeDown();
 	void setVolumeMute();
+	void setFullScreen();
+	void exitFullScreen();
+	void setPause();
+	void setExit();
 
 	int Screenshot();
-
 private:
 	//sdl±‰¡ø----------------------------------------------
 	int screen_w, screen_h;
@@ -55,10 +66,12 @@ private:
 
 	Decoder decoder;
 	Picture *sdlpicture;
+	Player_GUI *gui;
 
-	int counter_click_L;
-	int counter_time_L;
-	int counter_time_infor;
+	int cnt_time_infor;
+
+	int mouse_x;
+	int mouse_y;
 
 	char buffer_infor[255];
 

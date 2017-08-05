@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "Player_GUI.h"
 
 extern "C"
 {
@@ -25,7 +26,7 @@ void Player::Running()
 
 }
 
-bool Player::init()
+int Player::init()
 {
 	//------------------------------------SDL初始化---------------------------------------------------
 	//初始化视音频等模块
@@ -50,6 +51,7 @@ bool Player::init()
 		return -1;
 	}
 	SDL_SetWindowMinimumSize(screen, 300, 200);
+	gui = new Player_GUI(this);
 
 	//创建渲染器
 	sdlRenderer = SDL_CreateRenderer(screen, -1, 0);
@@ -97,9 +99,10 @@ bool Player::init()
 	av_dump_format(decoder.pFormatCtx, 0, decoder.filepath, false);
 	printf("------------------------------------\n");
 
-	counter_click_L = 0;
-	counter_time_L = 0;
-	counter_time_infor = 0;
+	cnt_time_infor = 0;
+
+	mouse_x = 0;
+	mouse_y = 0;
 
 	return true;
 }
@@ -111,7 +114,7 @@ void Player::update()
 	//同步窗口尺寸
 	update_sdlRect();
 
-	update_MouseLAction();
+	gui->update();
 }
 
 void Player::render()
@@ -119,6 +122,8 @@ void Player::render()
 	SDL_RenderClear(sdlRenderer);
 
 	SDL_RenderCopy(sdlRenderer, sdlTexture, nullptr, &sdlRect);
+
+	gui->render();
 
 	render_infor();
 
@@ -136,65 +141,20 @@ void Player::events()
 				update_decode();
 			break;
 		case SDL_MOUSEBUTTONDOWN:
-			if (event.button.button == SDL_BUTTON_LEFT) {
-				counter_click_L++;
-				counter_time_L = 0;
-			}
-			else if (event.button.button == SDL_BUTTON_MIDDLE) {
-
-			}
+		case SDL_MOUSEMOTION:
+			gui->event(event);
 			break;
 		case SDL_MOUSEWHEEL:
-			if (event.wheel.y > 0) {
-				setVolumeUP();
-			}
-			else if (event.wheel.y < 0) {
-				setVolumeDown();
-			}
+			mouseWheelevent();
 			break;
 		case SDL_KEYDOWN:
-			if (event.key.keysym.sym == SDLK_SPACE) {
-				thread_pause = !thread_pause;
-			}
-			else if (event.key.keysym.sym == SDLK_ESCAPE) {
-				if (SDL_GetWindowFlags(screen) == 0x1627) {
-					SDL_SetWindowFullscreen(screen, 0);
-				}
-				else
-					thread_exit = true;
-			}
-			else if (event.key.keysym.sym == SDLK_UP) {
-				setVolumeUP();
-			}
-			else if (event.key.keysym.sym == SDLK_DOWN) {
-				setVolumeDown();
-			}
-			else if (event.key.keysym.sym == SDLK_RIGHT) {
-				
-			}
-			else if (event.key.keysym.sym == SDLK_LEFT) {
-
-			}
-			else if (event.key.keysym.sym == SDLK_v) {
-				setVolumeMute();
-			}
-			else if (event.key.keysym.sym == SDLK_r) {
-				SDL_SetWindowFullscreen(screen, 0);
-				SDL_SetWindowSize(screen, decoder.pCodecCtx->width, decoder.pCodecCtx->height);
-			}
-			else if (event.key.keysym.sym == SDLK_s) {
-				Screenshot();
-			}
-			else if (event.key.keysym.sym == SDLK_f) {
-				SDL_SetWindowFullscreen(screen, SDL_WINDOW_FULLSCREEN_DESKTOP);
-			}
+			keyDownevent();
 			break;
 		case SDL_WINDOWEVENT:
-			//If Resize
-			SDL_GetWindowSize(screen, &screen_w, &screen_h);
+			Windowevent();
 			break;
 		case SDL_QUIT:
-			thread_exit = true;
+			setExit();
 			break;
 		default:
 			break;
@@ -231,27 +191,7 @@ void Player::update_sdlRect()
 	}
 }
 
-void Player::update_MouseLAction()
-{
-	if (counter_time_L == 400)
-		counter_time_L == 0;
 
-	counter_time_L++;
-
-	if (counter_click_L&&counter_time_L > 100) {
-		thread_pause = !thread_pause;
-		counter_click_L = 0;
-	}
-	else if (counter_click_L == 2 && counter_time_L < 100) {
-		if (SDL_GetWindowFlags(screen) == 0x1627) {
-			SDL_SetWindowFullscreen(screen, 0);
-		}
-		else
-			SDL_SetWindowFullscreen(screen, SDL_WINDOW_FULLSCREEN_DESKTOP);
-		counter_click_L = 0;
-	}
-
-}
 
 void Player::update_infor_volume()
 {
@@ -327,11 +267,75 @@ void Player::render_Text(const std::string & message, const std::string & fontFi
 
 void Player::render_infor()
 {
-	if (counter_time_infor) {
+	if (cnt_time_infor) {
 		render_Text(buffer_infor, Font_songti, 20, 40, 18, SDL_Color{ 0xFF,0xFF,0x00 });
-		counter_time_infor--;
+		cnt_time_infor--;
 	}
 
+}
+
+void Player::mouseWheelevent()
+{
+	if (event.wheel.y > 0) {
+		setVolumeUP();
+	}
+	else if (event.wheel.y < 0) {
+		setVolumeDown();
+	}
+}
+
+void Player::keyDownevent()
+{
+	if (event.key.keysym.sym == SDLK_SPACE) {
+		setPause();
+	}
+	else if (event.key.keysym.sym == SDLK_ESCAPE) {
+		if (SDL_GetWindowFlags(screen) == 0x1627) {
+			exitFullScreen();
+		}
+		else
+			setExit();
+	}
+	else if (event.key.keysym.sym == SDLK_UP) {
+		setVolumeUP();
+	}
+	else if (event.key.keysym.sym == SDLK_DOWN) {
+		setVolumeDown();
+	}
+	else if (event.key.keysym.sym == SDLK_RIGHT) {
+
+	}
+	else if (event.key.keysym.sym == SDLK_LEFT) {
+
+	}
+	else if (event.key.keysym.sym == SDLK_v) {
+		setVolumeMute();
+	}
+	else if (event.key.keysym.sym == SDLK_r) {
+		exitFullScreen();
+		SDL_SetWindowSize(screen, decoder.pCodecCtx->width, decoder.pCodecCtx->height);
+	}
+	else if (event.key.keysym.sym == SDLK_s) {
+		Screenshot();
+	}
+	else if (event.key.keysym.sym == SDLK_f) {
+		setFullScreen();
+	}
+}
+
+void Player::Windowevent()
+{
+	int sw, sh;
+	sw = screen_w;
+	sh = screen_h;
+	//If Resize
+	SDL_GetWindowSize(screen, &screen_w, &screen_h);
+
+	if ((sw != screen_w) || (sh != screen_h)) {
+		gui->rect_DownButton.y = screen_h - 80;
+	}
+	gui->rect_DownButton.w = screen_w;
+	gui->cnt_rect_down = screen_h - 80;
 }
 
 void Player::setVolumeUP()
@@ -339,7 +343,7 @@ void Player::setVolumeUP()
 	silence -= 6.4;
 	if (silence < 0)
 		silence = 0;
-	counter_time_infor = 1000;
+	cnt_time_infor = 1000;
 	isMute = false;
 	update_infor_volume();
 }
@@ -349,16 +353,41 @@ void Player::setVolumeDown()
 	silence += 6.4;
 	if (silence > 128)
 		silence = 128;
-	counter_time_infor = 1000;
+	cnt_time_infor = 1000;
 	isMute = false;
 	update_infor_volume();
 }
 
 void Player::setVolumeMute()
 {
-	counter_time_infor = 1000;
+	cnt_time_infor = 1000;
 	isMute = !isMute;
 	update_infor_volume();
+}
+
+void Player::setFullScreen()
+{
+	if (SDL_GetWindowFlags(screen) == 0x1627) {
+		exitFullScreen();
+	}
+	else {
+		SDL_SetWindowFullscreen(screen, SDL_WINDOW_FULLSCREEN_DESKTOP);
+	}
+}
+
+void Player::exitFullScreen()
+{
+	SDL_SetWindowFullscreen(screen, 0);
+}
+
+void Player::setPause()
+{
+	thread_pause = !thread_pause;
+}
+
+void Player::setExit()
+{
+	thread_exit = true;
 }
 
 int Player::Screenshot()
@@ -395,7 +424,7 @@ int Player::Screenshot()
 	IMG_SavePNG(surface, buffer);
 
 	sprintf(buffer_infor, "ScreenShot Success");
-	counter_time_infor = 1000;
+	cnt_time_infor = 1000;
 
 	SDL_free(surface);
 
