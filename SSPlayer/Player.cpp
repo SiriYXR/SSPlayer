@@ -1,6 +1,29 @@
 #include "Player.h"
 
+extern "C"
+{
+#pragma comment(lib,"SDL2_image.lib")
+#include <SDL_image.h>
+
+#include <sys/timeb.h>
+}
+
 #include <string>
+
+
+void Player::Running()
+{
+
+	SDL_CreateThread(Thread::sfp_refresh_thread, nullptr, nullptr);
+	for (; isrunning(); SDL_Delay(1)) {
+		events();
+
+		update();
+
+		render();
+	}
+
+}
 
 bool Player::init()
 {
@@ -88,8 +111,6 @@ void Player::update()
 	//同步窗口尺寸
 	update_sdlRect();
 
-	update_infor_volume();
-
 	update_MouseLAction();
 }
 
@@ -125,18 +146,10 @@ void Player::events()
 			break;
 		case SDL_MOUSEWHEEL:
 			if (event.wheel.y > 0) {
-				silence -= 6;
-				if (silence <0)
-					silence = 0;
-				counter_time_infor = 1000;
-				isMute = false;
+				setVolumeUP();
 			}
 			else if (event.wheel.y < 0) {
-				silence += 6;
-				if (silence > 128)
-					silence = 128;
-				counter_time_infor = 1000;
-				isMute = false;
+				setVolumeDown();
 			}
 			break;
 		case SDL_KEYDOWN:
@@ -151,32 +164,26 @@ void Player::events()
 					thread_exit = true;
 			}
 			else if (event.key.keysym.sym == SDLK_UP) {
-				silence -= 6;
-				if (silence <0)
-					silence = 0;
-				counter_time_infor = 1000;
-				isMute = false;
+				setVolumeUP();
 			}
 			else if (event.key.keysym.sym == SDLK_DOWN) {
-				silence += 6;
-				if (silence > 128)
-					silence = 128;
-				counter_time_infor = 1000;
-				isMute = false;
+				setVolumeDown();
 			}
 			else if (event.key.keysym.sym == SDLK_RIGHT) {
-
+				
 			}
 			else if (event.key.keysym.sym == SDLK_LEFT) {
 
 			}
 			else if (event.key.keysym.sym == SDLK_v) {
-				counter_time_infor = 1000;
-				isMute = !isMute;
+				setVolumeMute();
 			}
 			else if (event.key.keysym.sym == SDLK_r) {
 				SDL_SetWindowFullscreen(screen, 0);
 				SDL_SetWindowSize(screen, decoder.pCodecCtx->width, decoder.pCodecCtx->height);
+			}
+			else if (event.key.keysym.sym == SDLK_s) {
+				Screenshot();
 			}
 			else if (event.key.keysym.sym == SDLK_f) {
 				SDL_SetWindowFullscreen(screen, SDL_WINDOW_FULLSCREEN_DESKTOP);
@@ -210,7 +217,7 @@ void Player::update_sdlRect()
 		sdlRect.x = 0;
 		sdlRect.y = (screen_h - sdlRect.h) / 2;
 	}
-	else if ((double)screen_w / (double)screen_h >(double)decoder.pCodecCtx->width / (double)decoder.pCodecCtx->height) {
+	else if ((double)screen_w / (double)screen_h > (double)decoder.pCodecCtx->width / (double)decoder.pCodecCtx->height) {
 		sdlRect.w = decoder.pCodecCtx->width*((double)screen_h / (double)decoder.pCodecCtx->height);
 		sdlRect.h = screen_h;
 		sdlRect.x = (screen_w - sdlRect.w) / 2;
@@ -248,11 +255,11 @@ void Player::update_MouseLAction()
 
 void Player::update_infor_volume()
 {
-	if (isMute) {
+	if (isMute==true) {
 		sprintf(buffer_infor, "Volume:Mute");
 	}
 	else {
-		float volume = (float)(128 - silence) / 128 * 100;
+		double volume = (128 - silence) / 128 * 100;
 		sprintf(buffer_infor, "Volume:%.2f%%", volume);
 	}
 }
@@ -325,4 +332,72 @@ void Player::render_infor()
 		counter_time_infor--;
 	}
 
+}
+
+void Player::setVolumeUP()
+{
+	silence -= 6.4;
+	if (silence < 0)
+		silence = 0;
+	counter_time_infor = 1000;
+	isMute = false;
+	update_infor_volume();
+}
+
+void Player::setVolumeDown()
+{
+	silence += 6.4;
+	if (silence > 128)
+		silence = 128;
+	counter_time_infor = 1000;
+	isMute = false;
+	update_infor_volume();
+}
+
+void Player::setVolumeMute()
+{
+	counter_time_infor = 1000;
+	isMute = !isMute;
+	update_infor_volume();
+}
+
+int Player::Screenshot()
+{
+	int  depth, pitch;
+
+	SDL_Rect rect;
+	rect.x = 0;
+	rect.y = 0;
+	SDL_GetWindowSize(screen, &rect.w, &rect.h);
+
+	pitch = rect.w * 4;   // 每行图像所占字节数  
+	depth = 4 * 8;        // 每像素所占位数(R8位G8位B8位A8位)   
+
+	int rmask, gmask, bmask, amask;
+	rmask = 0x00FF0000; gmask = 0x0000FF00; bmask = 0x000000FF; amask = 0x00000000; // RGBA8888模式  
+
+	SDL_Surface *surface;
+	surface = SDL_CreateRGBSurface(0, rect.w, rect.h, depth, rmask, gmask, bmask, amask);
+	if (NULL == surface)
+		return 0;
+
+	SDL_RenderReadPixels(sdlRenderer, &rect, 0, surface->pixels, pitch);
+
+	timeb tp;
+	tm *tm;
+
+	ftime(&tp);
+	tm = localtime(&tp.time);
+
+	char buffer[255];
+	sprintf(buffer, "data/screenshot/SSPlayer_ScreenShot_%.4d%.2d%.2d%.2d%.2d%.2d.png", 1900 + tm->tm_year, 1 + tm->tm_mon, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec);
+
+	IMG_SavePNG(surface, buffer);
+
+	sprintf(buffer_infor, "ScreenShot Success");
+	counter_time_infor = 1000;
+
+	SDL_free(surface);
+
+	return 1;
 }

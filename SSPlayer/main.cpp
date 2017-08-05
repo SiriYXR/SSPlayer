@@ -17,14 +17,8 @@
 int main(int argc, char **argv)
 {
 	Player ssplayer;
-	SDL_CreateThread(Thread::sfp_refresh_thread, nullptr, nullptr);
-	for (; ssplayer.running();SDL_Delay(1)) {
-		ssplayer.events();
 
-		ssplayer.update();
-
-		ssplayer.render();
-	}
+	ssplayer.Running();
 
 	return 0;
 }

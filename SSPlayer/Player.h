@@ -14,13 +14,16 @@ public:
 		SDL_CloseAudio();
 		SDL_Quit();
 	};
+
+	void Running();
+
+private:
 	bool init();
 	void update();
 	void render();
 	void events();
-	bool running() { return m_bRunning; };
+	bool isrunning() { return m_bRunning; };
 
-private:
 	void update_running() { m_bRunning = !thread_exit; };
 	void update_decode();
 	void update_sdlRect();
@@ -32,6 +35,12 @@ private:
 	SDL_Texture * render_Text(const std::string & message, const std::string & fontFile, int fontSize, SDL_Color color);
 	void render_Text(const std::string & message, const std::string & fontFile, int x, int y, int fontSize, SDL_Color color);
 	void render_infor();
+
+	void setVolumeUP();
+	void setVolumeDown();
+	void setVolumeMute();
+
+	int Screenshot();
 
 private:
 	//sdl±‰¡ø----------------------------------------------

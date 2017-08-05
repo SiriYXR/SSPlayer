@@ -45,6 +45,6 @@ extern bool thread_pause;
 extern bool isMute;
 
 extern double fps;
-extern int silence;
+extern double silence;
 
 extern uint8_t *copy_buf;
