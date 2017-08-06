@@ -89,8 +89,8 @@ void Player_Button::render()
 	if (isclick) {
 		if (ison) {
 			render_Draw(Texture_click_on, rect.x, rect.y);
-			boxRGBA(renderer, x, rect.y - fontSize, x + fontSize*string_click.length()- fontSize, rect.y, backr, backg, backb, backa);
-			render_Text(string_click, Font_songti, x, rect.y - fontSize, fontSize, color);
+			boxRGBA(renderer, x-20, rect.y - fontSize, x + fontSize*string_click.length()*0.55, rect.y, backr, backg, backb, backa);
+			render_Text(string_click, Font_songti, x-15, rect.y - fontSize, fontSize, color);
 		}
 		else {
 			render_Draw(Texture_click, rect.x, rect.y);
@@ -99,8 +99,8 @@ void Player_Button::render()
 	else {
 		if (ison) {
 			render_Draw(Texture_unclick_on, rect.x, rect.y);
-			boxRGBA(renderer, x, rect.y - fontSize, x + fontSize*string_click.length() - fontSize, rect.y, backr, backg, backb, backa);
-			render_Text(string_unclick, Font_songti, x, rect.y - fontSize, fontSize, color);
+			boxRGBA(renderer, x-20, rect.y - fontSize, x + fontSize*string_click.length()*0.55, rect.y, backr, backg, backb, backa);
+			render_Text(string_unclick, Font_songti, x-15, rect.y - fontSize, fontSize, color);
 		}
 		else {
 			render_Draw(Texture_unclick, rect.x, rect.y);
