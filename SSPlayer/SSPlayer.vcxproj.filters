@@ -39,6 +39,9 @@
     <ClCompile Include="Player_GUI.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Player_Button.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="acyclebuffer.h">
@@ -60,6 +63,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Player_GUI.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Player_Button.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

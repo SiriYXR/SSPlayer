@@ -25,5 +25,24 @@ private:
 
 public:
 	SDL_Surface *icon = nullptr;
+
+	SDL_Texture *play_white = nullptr;
+	SDL_Texture *pause_white = nullptr;
+	SDL_Texture *stop_white = nullptr;
+	SDL_Texture *volume_white = nullptr;
+	SDL_Texture *mute_white = nullptr;
+	SDL_Texture *fullscreen_white = nullptr;
+	SDL_Texture *exitfullscreen_white = nullptr;
+	SDL_Texture *screenshot_white = nullptr;
+	
+	SDL_Texture *play_blue = nullptr;
+	SDL_Texture *pause_blue = nullptr;
+	SDL_Texture *stop_blue = nullptr;
+	SDL_Texture *volume_blue = nullptr;
+	SDL_Texture *mute_blue = nullptr;
+	SDL_Texture *fullscreen_blue = nullptr;
+	SDL_Texture *exitfullscreen_blue = nullptr;
+	SDL_Texture *screenshot_blue = nullptr;
+
 };
 

@@ -4,6 +4,9 @@
 extern "C"
 {
 #pragma comment(lib,"SDL2_image.lib")
+#pragma comment(lib,"SDL2_gfx.lib")
+
+#include <SDL2_gfxPrimitives.h>
 #include <SDL_image.h>
 
 #include <sys/timeb.h>
@@ -11,6 +14,14 @@ extern "C"
 
 #include <string>
 
+
+Player::~Player()
+{
+	delete sdlpicture;
+	delete gui;
+	SDL_CloseAudio();
+	SDL_Quit();
+}
 
 void Player::Running()
 {
@@ -51,7 +62,7 @@ int Player::init()
 		return -1;
 	}
 	SDL_SetWindowMinimumSize(screen, 300, 200);
-	gui = new Player_GUI(this);
+	SDL_SetWindowMaximumSize(screen,1920,1017);
 
 	//创建渲染器
 	sdlRenderer = SDL_CreateRenderer(screen, -1, 0);
@@ -60,6 +71,8 @@ int Player::init()
 	sdlpicture = new Picture(sdlRenderer);
 	if (sdlpicture == nullptr)
 		throw std::runtime_error("Picture Init Failed");
+
+	gui = new Player_GUI(this);
 
 	//设置图标
 	SDL_SetWindowIcon(screen, sdlpicture->icon);
@@ -120,6 +133,8 @@ void Player::update()
 void Player::render()
 {
 	SDL_RenderClear(sdlRenderer);
+
+	boxRGBA(sdlRenderer,0, 0, screen_w,screen_h, 0x00, 0x00, 0x00, 255);
 
 	SDL_RenderCopy(sdlRenderer, sdlTexture, nullptr, &sdlRect);
 
@@ -336,6 +351,15 @@ void Player::Windowevent()
 	}
 	gui->rect_DownButton.w = screen_w;
 	gui->cnt_rect_down = screen_h - 80;
+
+}
+
+bool Player::isFullScreen()
+{
+	if (SDL_GetWindowFlags(screen) == 0x1627) {
+		return true;
+	}
+	return false;
 }
 
 void Player::setVolumeUP()
@@ -367,7 +391,7 @@ void Player::setVolumeMute()
 
 void Player::setFullScreen()
 {
-	if (SDL_GetWindowFlags(screen) == 0x1627) {
+	if (isFullScreen()) {
 		exitFullScreen();
 	}
 	else {

@@ -1,5 +1,5 @@
 #pragma once
-#include "function.h"
+#include "Player_Button.h"
 
 class Player;
 
@@ -19,13 +19,24 @@ private:
 	void update_CounterSecond();
 	void update_Rect_DownButton();
 	void update_MouseLAction();
+	void update_Button();
 
 	void render_DownButton();
+	void render_Button();
 
 	void mouseButtonDownevent(SDL_Event event);
 	void mouseMotionevent(SDL_Event event);
+	void buttonMotionevent(SDL_Event event);
+
+	void buttonSingleClick();
 private:
 	Player *player;
+	
+	Player_Button *buttonPlaye;
+	Player_Button *buttonStop;
+	Player_Button *buttonVolume;
+	Player_Button *buttonScreenShot;
+	Player_Button *buttonFullScreen;
 
 	SDL_Rect rect_DownButton;
 
@@ -34,6 +45,9 @@ private:
 	int cnt_time_L;
 	int cnt_time_rect_down;
 	int cnt_rect_down;
+
+	int mouseClick_x;
+	int mouseClick_y;
 
 };
 

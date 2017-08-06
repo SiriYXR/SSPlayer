@@ -4,6 +4,7 @@
 #include "Decoder.h"
 #include "Picture.h"
 
+
 #include <string>
 
 class Player_GUI;
@@ -14,14 +15,10 @@ friend Player_GUI;
 
 public:
 	Player() :m_bRunning(true) { init(); };
-	~Player() {
-		delete sdlpicture;
-		delete gui;
-		SDL_CloseAudio();
-		SDL_Quit();
-	};
+	~Player();
 
 	void Running();
+
 private:
 	int init();
 	void update();
@@ -44,14 +41,15 @@ private:
 	void keyDownevent();
 	void Windowevent();
 
+	bool isFullScreen();
+
 	void setVolumeUP();
 	void setVolumeDown();
+	void setPause();
 	void setVolumeMute();
 	void setFullScreen();
 	void exitFullScreen();
-	void setPause();
 	void setExit();
-
 	int Screenshot();
 private:
 	//sdl±‰¡ø----------------------------------------------
